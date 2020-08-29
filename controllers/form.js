@@ -2,13 +2,14 @@ const ejs = require("ejs");
 const transporter = require("../helpers/mailConfig");
 
 exports.sendMail = (req, res) => {
-  const { name, email, message } = req.body;
+  const { name, email, message, subject } = req.body;
 
   const _path = `${__dirname}/../public/test.ejs`;
   const userTemplate = {
     name,
     message,
     email,
+    subject,
   };
   ejs.renderFile(_path, { userTemplate }, (error, result) => {
     if (error) {
