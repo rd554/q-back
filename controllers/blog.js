@@ -187,7 +187,13 @@ exports.read = (req, res) => {
           error: errorHandler(err),
         });
       }
-      res.json(data);
+      if (data) {
+        res.json(data);
+      } else {
+        res.json({
+          error: "data not found",
+        });
+      }
     });
 };
 
@@ -302,7 +308,7 @@ exports.listRelated = (req, res) => {
 exports.listSearch = (req, res) => {
   const { search } = req.query;
   if (search) {
-    Blog.findOne(
+    Blog.find(
       {
         $or: [
           { title: { $regex: search, $options: "i" } },
@@ -315,8 +321,14 @@ exports.listSearch = (req, res) => {
             error: errorHandler(err),
           });
         }
-        res.json(blogs);
+        if (blogs) {
+          res.json(blogs);
+        } else {
+          res.json({
+            error: "Data not found",
+          });
+        }
       }
-    ).select("-photo, -body");
+    ).select("title slug");
   }
 };
