@@ -13,6 +13,7 @@ const userRoutes = require("./routes/user");
 const categoryRoutes = require("./routes/category");
 const tagRoutes = require("./routes/tag");
 const formRoutes = require("./routes/form");
+const communityRoutes = require("./routes/community");
 
 // app
 const app = express();
@@ -44,6 +45,7 @@ app.use("/api", categoryRoutes);
 app.use("/api", tagRoutes);
 app.use("/api", formRoutes);
 app.use(express.static("public"));
+app.use("/api", communityRoutes);
 
 // port
 const port = process.env.PORT || 8000;
