@@ -1,5 +1,4 @@
 const Question = require("../models/Cquestion");
-const { answer } = require("../models/Canswer");
 const { errorHandler } = require("../helpers/dbErrorHandler");
 
 exports.postQuestion = (req, res) => {
@@ -67,17 +66,18 @@ exports.postAnswer = (req, res) => {
 };
 
 exports.listAllCards = (req, res) => {
-  let limit = req.body.limit ? parseInt(req.body.limit) : 10;
-  let skip = req.body.skip ? parseInt(req.body.skip) : 0;
+  // let limit = req.body.limit ? parseInt(req.body.limit) : 10;
+  // let skip = req.body.skip ? parseInt(req.body.skip) : 1;
+  let limit = 5;
+  let pageNo = parseInt(req.body.pageNo) || 1;
+  let skip = limit * (pageNo - 1);
+  if (pageNo === 1) skip = 0;
 
-  Community.find({})
-    .populate("question", "_id username")
-    .populate("answer", "_id username")
+  Question.find()
     .populate("postedBy", "_id name")
-    .sort({ createdAt: -1 })
-    .skip(skip)
+    .populate("answers.userId", "_id name")
     .limit(limit)
-    .select("question answer _id name postedBy createAt updatedAt")
+    .skip(skip)
     .exec((err, data) => {
       if (err) {
         return res.status(400).json({
@@ -95,11 +95,9 @@ exports.listAllCards = (req, res) => {
 };
 
 exports.list = (req, res) => {
-  Community.find({})
-    .populate("question", "_id username")
-    .populate("answer", "_id username")
+  Question.find()
     .populate("postedBy", "_id name")
-    .select("question answer _id name postedBy createAt updatedAt")
+    .populate("answers.userId", "_id name")
     .exec((err, data) => {
       if (err) {
         return res.status(400).json({
