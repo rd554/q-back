@@ -16,10 +16,12 @@ const questionSchema = new mongoose.Schema(
       data: String,
       required: false,
     },
-    answers: {
-      type: [],
-      required: false,
-    },
+    answers: [
+      {
+        userId: { type: ObjectId, ref: "User" },
+        answer: String,
+      },
+    ],
   },
 
   { timeStamps: true }
