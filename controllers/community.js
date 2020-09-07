@@ -68,10 +68,12 @@ exports.postAnswer = (req, res) => {
 exports.listAllCards = (req, res) => {
   // let limit = req.body.limit ? parseInt(req.body.limit) : 10;
   // let skip = req.body.skip ? parseInt(req.body.skip) : 1;
-  let limit = 5;
+  let limit = 10;
   let pageNo = parseInt(req.body.pageNo) || 1;
   let skip = limit * (pageNo - 1);
   if (pageNo === 1) skip = 0;
+
+  let questions;
 
   Question.find()
     .populate("postedBy", "_id name")
@@ -84,8 +86,10 @@ exports.listAllCards = (req, res) => {
           error: errorHandler(err),
         });
       }
-      if (data) {
-        res.json(data);
+      // uddating the existing array
+      questions = data;
+      if (questions) {
+        res.json({ questions, size: questions.length });
       } else {
         res.json({
           error: "Data not found",
