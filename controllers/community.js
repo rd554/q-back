@@ -10,7 +10,7 @@ exports.postQuestion = (req, res) => {
   newQuestion.save((error, result) => {
     console.log(error);
     if (error) {
-      res.json({ Status: false, msg: "Question posting Unsuccessfull..!" });
+      res.json({ Status: false, msg: "Question posting Unsuccessful..!" });
     } else {
       res.json({
         Status: true,
@@ -118,31 +118,114 @@ exports.list = (req, res) => {
     });
 };
 
-//   const question = req.body.question;
-//   const userId = req.user._id;
+exports.updateQuestion = (req, res) => {
+  const questionId = req.body.questionId;
+  const questionContent = req.body.questionContent;
 
-//   try {
-//     await Question.create({
-//       question,
-//       userId,
-//     });
-//     res.json({ Status: true, Message: "Question created successfully" });
-//   } catch (err) {
-//     res.json({ Status: false, Message: err.message });
-//   }
-// };
+  Question.findOneAndUpdate(
+    { _id: questionId },
+    { $set: { question: questionContent } },
+    { new: true },
+    (err, question) => {
+      if (err) {
+        res.status(400).json({
+          error: errorHandler(err),
+        });
+        return;
+      } else {
+        res.status(200).json({
+          msg: "Question updated successfully",
+          question,
+        });
+      }
+    }
+  );
+};
 
-// exports.postAnswer = async (req, res) => {
-//   const answer = req.body.answer;
-//   const userId = req.user._id;
+exports.updateAnswer = (req, res) => {
+  const questionId = req.body.questionId;
+  const answerId = req.body.answerId;
+  const answerContent = req.body.answerContent;
 
-//   try {
-//     await Answer.create({
-//       answer,
-//       userId,
-//     });
-//     res.json({ Status: true, Message: "Answer Created" });
-//   } catch (err) {
-//     res.json({ Status: false, Message: err.message });
-//   }
-// };
+  // Question.findOne({ _id: questionId }).exec((err, question) => {
+  //   if (err) {
+  //     res.status(400).json({
+  //       error: errorHandler(err),
+  //     });
+  //   }
+  //   if (!question) {
+  //     res.status(400).json({
+  //       error: "question not found",
+  //     });
+  //   } else {
+  Question.findOneAndUpdate(
+    { _id: questionId, answers: { $elemMatch: { _id: answerId } } },
+    {
+      $set: {
+        "answers.$.answer": answerContent,
+      },
+    },
+    { new: true },
+    (err, answer) => {
+      if (err) {
+        res.status(400).json({
+          error: errorHandler(err),
+        });
+      }
+      if (!answer) {
+        res.json({
+          error: "Something went wrong. Please try again.",
+        });
+      } else {
+        res.json({
+          msg: "answer updated successfully",
+          answer,
+        });
+      }
+    }
+  );
+  //   }
+  // });
+};
+
+exports.removeQuestion = (req, res) => {
+  const questionId = req.body.questionId;
+
+  Question.findOneAndRemove({ _id: questionId }).exec((err, question) => {
+    if (err) {
+      res.status(400).json({
+        error: errorHandler(err),
+      });
+    }
+    if (!question) {
+      res.status(400).json({
+        error: "question not found",
+      });
+    } else {
+      res.json({
+        msg: "Question deleted successfully",
+      });
+    }
+  });
+};
+
+exports.removeAnswer = (req, res) => {
+  const questionId = req.body.questionId;
+  const answerId = req.body.answerId;
+
+  Question.findByIdAndUpdate(
+    questionId,
+    { $pull: { answers: { _id: answerId } } },
+    (err, success) => {
+      if (err) {
+        res.status(400).json({
+          error: errorHandler(err),
+        });
+      }
+      return res.json({
+        msg: "Answer deleted successfully",
+        success,
+      });
+    }
+  );
+};
