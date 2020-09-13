@@ -25,44 +25,33 @@ exports.postAnswer = (req, res) => {
   const answer = req.body.answer || "";
   const userId = req.user._id || "";
   const questionId = req.body.questionId || "";
-  Question.findOne({ _id: questionId }, (err, question) => {
-    if (err) {
-      res.status(400).json({
-        error: errorHandler(err),
-      });
-      return;
-    }
-    if (!question) {
-      res.status(400).json({
-        error: "question not found",
-      });
-      return;
-    }
-    let newAnswers = [...question.answers, { answer, userId }];
-    return question.updateOne({ answers: newAnswers }, (err, success) => {
+
+  Question.findOneAndUpdate(
+    { _id: questionId },
+    {
+      $push: {
+        answers: { answer, userId },
+      },
+    },
+    { new: true },
+    (err, newAnswer) => {
       if (err) {
         res.status(400).json({
           error: errorHandler(err),
         });
-        return;
       }
-      if (success) {
-        res.json({
-          msg: "Answer posted successfully",
-        });
-      } else {
+      if (!newAnswer) {
         res.json({
           error: "Something went wrong. Please try again.",
         });
+      } else {
+        res.json({
+          msg: "answer added successfully",
+          newAnswer,
+        });
       }
-    });
-  });
-
-  // {
-  //   answer: req.body.answer,
-  //   postedBy: req.user._id,
-
-  // }
+    }
+  );
 };
 
 exports.listAllCards = (req, res) => {
@@ -75,7 +64,7 @@ exports.listAllCards = (req, res) => {
 
   let questions;
 
-  Question.find()
+  Question.find({}, { answers: { $slice: 2 } })
     .populate("postedBy", "_id name")
     .populate("answers.userId", "_id name")
     .limit(limit)
@@ -147,17 +136,6 @@ exports.updateAnswer = (req, res) => {
   const answerId = req.body.answerId;
   const answerContent = req.body.answerContent;
 
-  // Question.findOne({ _id: questionId }).exec((err, question) => {
-  //   if (err) {
-  //     res.status(400).json({
-  //       error: errorHandler(err),
-  //     });
-  //   }
-  //   if (!question) {
-  //     res.status(400).json({
-  //       error: "question not found",
-  //     });
-  //   } else {
   Question.findOneAndUpdate(
     { _id: questionId, answers: { $elemMatch: { _id: answerId } } },
     {
@@ -184,8 +162,6 @@ exports.updateAnswer = (req, res) => {
       }
     }
   );
-  //   }
-  // });
 };
 
 exports.removeQuestion = (req, res) => {
@@ -228,4 +204,20 @@ exports.removeAnswer = (req, res) => {
       });
     }
   );
+};
+
+exports.getSingleQuestion = async (req, res) => {
+  const questionId = req.params.questionId || "";
+  if (questionId === "") {
+    res.json({ error: "Question id not passed" });
+  }
+
+  try {
+    let questionResult = await Question.findOne({ _id: questionId }).select(
+      "question postedBy _id"
+    );
+    res.json(questionResult);
+  } catch (error) {
+    res.json({ error });
+  }
 };
