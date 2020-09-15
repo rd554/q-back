@@ -67,6 +67,8 @@ exports.listAllCards = (req, res) => {
   Question.find({}, { answers: { $slice: 2 } })
     .populate("postedBy", "_id name")
     .populate("answers.userId", "_id name")
+    .sort({ _id: -1 })
+    .select("_id question postedBy createdAt")
     .limit(limit)
     .skip(skip)
     .exec((err, data) => {
@@ -88,9 +90,11 @@ exports.listAllCards = (req, res) => {
 };
 
 exports.list = (req, res) => {
-  Question.find()
+  Question.find({}, { answers: { $slice: 2 } })
     .populate("postedBy", "_id name")
     .populate("answers.userId", "_id name")
+    .sort({ _id: -1 })
+    .select("_id question postedBy createdAt")
     .exec((err, data) => {
       if (err) {
         return res.status(400).json({
@@ -217,6 +221,49 @@ exports.getSingleQuestion = async (req, res) => {
       "question postedBy _id"
     );
     res.json(questionResult);
+  } catch (error) {
+    res.json({ error });
+  }
+};
+
+exports.getSingleAnswer = async (req, res) => {
+  const answerId = req.params.answerId || "";
+
+  if (answerId === "") {
+    res.json({ error: "Answer id not passed" });
+  }
+
+  try {
+    let answerResult = await Question.findOne({
+      "answers._id": answerId,
+    }).select({
+      answers: { $elemMatch: { _id: answerId } },
+    });
+
+    if (answerResult.answers.length > 0) {
+      res.json(answerResult.answers[0]);
+    } else {
+      res.json({
+        msg: "Answer not found",
+      });
+    }
+  } catch (error) {
+    res.json({ error });
+  }
+};
+
+exports.postReply = async (req, res) => {
+  const reply = req.body.reply || "";
+  const userId = req.user._id || "";
+  const questionId = req.body.questionId || "";
+  const answerId = req.body.answerId || "";
+
+  try {
+    let newReply = await Question.findByIdAndUpdate(
+      { _id: questionId },
+      { _id: answerId }
+    ).push({ answers: { answer: { reply: { reply, userId } } } });
+    res.json(newReply);
   } catch (error) {
     res.json({ error });
   }

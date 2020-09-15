@@ -19,12 +19,31 @@ const questionSchema = new mongoose.Schema(
     answers: [
       {
         userId: { type: ObjectId, ref: "User" },
+        answerType: {
+          data: String,
+          required: false,
+        },
         answer: String,
+        replies: [
+          {
+            userId: { type: ObjectId, ref: "User" },
+            reply: String,
+            replyType: {
+              data: String,
+              required: false,
+            },
+          },
+        ],
       },
     ],
     questionType: {
       data: String,
       required: false,
+    },
+    createdAt: {
+      type: Date,
+      required: true,
+      default: Date.now,
     },
   },
 
