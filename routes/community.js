@@ -10,6 +10,10 @@ const {
   removeQuestion,
   removeAnswer,
   getSingleQuestion,
+  getSingleAnswer,
+  postReply,
+  // updateReply,
+  // removeReply,
 } = require("../controllers/community");
 
 const { requireSignin } = require("../controllers/auth");
@@ -23,5 +27,13 @@ router.put("/community/updateAnswer", requireSignin, updateAnswer);
 router.delete("/community/deleteQuestion", requireSignin, removeQuestion);
 router.delete("/community/deleteAnswer", requireSignin, removeAnswer);
 router.get("/community/getSingleQuestion/:questionId", getSingleQuestion);
+router.get("/community/getSingleAnswer/:answerId", getSingleAnswer);
+router.post(
+  "/community/postReply/:questionId/:answerId",
+  requireSignin,
+  postReply
+);
+// router.put("/community/updateReply/:answerId", requireSignin, updateReply);
+// router.delete("/community/deleteReply/:answerId", requireSignin, removeReply);
 
 module.exports = router;
