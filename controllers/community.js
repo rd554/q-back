@@ -255,16 +255,85 @@ exports.getSingleAnswer = async (req, res) => {
 exports.postReply = async (req, res) => {
   const reply = req.body.reply || "";
   const userId = req.user._id || "";
-  const questionId = req.body.questionId || "";
   const answerId = req.body.answerId || "";
+  const questionId = req.body.questionId || "";
 
   try {
     let newReply = await Question.findByIdAndUpdate(
-      { _id: questionId },
-      { _id: answerId }
-    ).push({ answers: { answer: { reply: { reply, userId } } } });
-    res.json(newReply);
+      {
+        _id: questionId,
+        "answer._id": answerId,
+      },
+      {
+        $addToSet: {
+          answer: {
+            replies: { reply, userId },
+          },
+        },
+      }
+    );
+    if (newReply) {
+      res.json({
+        msg: "Reply posted successfully",
+        newReply,
+      });
+    } else {
+      res.json({
+        msg: "Reply not found",
+      });
+    }
   } catch (error) {
     res.json({ error });
   }
+};
+
+//   Question.findOneAndUpdate(
+//     { _id: answerId },
+//     { $addToSet: { replies: { reply, userId } } },
+//     (err, newReply) => {
+//       if (err) {
+//         res.status(400).json({
+//           error: errorHandler(err),
+//         });
+//       } else {
+//         res.json({
+//           msg: "Reply posted successfully",
+//           newReply,
+//         });
+//       }
+//     }
+//   );
+// };
+
+exports.updateReply = (req, res) => {
+  const answerId = req.body.answerId;
+  const replyId = req.body.replyId;
+  const replyContent = req.body.replyContent;
+
+  Question.findOneAndUpdate(
+    { _id: answerId, replies: { $elemMatch: { _id: replyId } } },
+    {
+      $set: {
+        "replies.$.reply": replyContent,
+      },
+    },
+    { new: true },
+    (err, reply) => {
+      if (err) {
+        res.status(400).json({
+          error: errorHandler(err),
+        });
+      }
+      if (!reply) {
+        res.json({
+          error: "Something went wrong. Please try again.",
+        });
+      } else {
+        res.json({
+          msg: "Reply updated successfully",
+          reply,
+        });
+      }
+    }
+  );
 };
