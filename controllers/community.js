@@ -67,8 +67,8 @@ exports.listAllCards = (req, res) => {
   let questions;
 
   Question.find({}, { answers: { $slice: 2 } })
-    .populate("postedBy", "_id name")
-    .populate("answers.userId", "_id name")
+    .populate("postedBy", "_id name email")
+    .populate("answers.userId", "_id name email")
     .sort({ _id: -1 })
     .select("_id question postedBy createdAt questionScope")
     .limit(limit)
