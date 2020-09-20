@@ -12,6 +12,9 @@ const questionSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    questionScope: {
+      type: String,
+    },
     photo: {
       data: String,
       required: false,
@@ -24,16 +27,9 @@ const questionSchema = new mongoose.Schema(
           required: false,
         },
         answer: String,
-        replies: [
-          {
-            userId: { type: ObjectId, ref: "User" },
-            reply: String,
-            replyType: {
-              data: String,
-              required: false,
-            },
-          },
-        ],
+        answerScope: {
+          type: String,
+        },
       },
     ],
     questionType: {
