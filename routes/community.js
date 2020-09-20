@@ -11,8 +11,8 @@ const {
   removeAnswer,
   getSingleQuestion,
   getSingleAnswer,
-  postReply,
-  updateReply,
+  // postReply,
+  // updateReply,
   // removeReply,
 } = require("../controllers/community");
 
@@ -28,8 +28,8 @@ router.delete("/community/deleteQuestion", requireSignin, removeQuestion);
 router.delete("/community/deleteAnswer", requireSignin, removeAnswer);
 router.get("/community/getSingleQuestion/:questionId", getSingleQuestion);
 router.get("/community/getSingleAnswer/:answerId", getSingleAnswer);
-router.post("/community/postReply", requireSignin, postReply);
-router.put("/community/updateReply", requireSignin, updateReply);
-// router.delete("/community/deleteReply/:answerId", requireSignin, removeReply);
+// router.post("/community/postReply", requireSignin, postReply);
+// router.put("/community/updateReply", requireSignin, updateReply);
+// // router.delete("/community/deleteReply/:answerId", requireSignin, removeReply);
 
 module.exports = router;

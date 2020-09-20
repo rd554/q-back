@@ -281,9 +281,10 @@ exports.photo = (req, res) => {
         return res.status(400).json({
           error: errorHandler(err),
         });
+      } else {
+        res.set("Content-Type", blog.photo.contentType);
+        return res.send(blog.photo.data);
       }
-      res.set("Content-Type", blog.photo.contentType);
-      return res.send(blog.photo.data);
     });
 };
 

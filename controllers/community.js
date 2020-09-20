@@ -3,8 +3,9 @@ const { errorHandler } = require("../helpers/dbErrorHandler");
 
 exports.postQuestion = (req, res) => {
   const newQuestion = new Question({
-    question: req.body.question,
-    postedBy: req.user._id,
+    question: req.body.question || "",
+    postedBy: req.user._id || "",
+    questionScope: req.body.selectedScope || "",
   });
   console.log(newQuestion);
   newQuestion.save((error, result) => {
@@ -25,12 +26,13 @@ exports.postAnswer = (req, res) => {
   const answer = req.body.answer || "";
   const userId = req.user._id || "";
   const questionId = req.body.questionId || "";
+  const selectedScope = req.body.selectedScope || "";
 
   Question.findOneAndUpdate(
     { _id: questionId },
     {
       $push: {
-        answers: { answer, userId },
+        answers: { answer, userId, answerScope: selectedScope },
       },
     },
     { new: true },
@@ -68,7 +70,7 @@ exports.listAllCards = (req, res) => {
     .populate("postedBy", "_id name")
     .populate("answers.userId", "_id name")
     .sort({ _id: -1 })
-    .select("_id question postedBy createdAt")
+    .select("_id question postedBy createdAt questionScope")
     .limit(limit)
     .skip(skip)
     .exec((err, data) => {
@@ -252,40 +254,40 @@ exports.getSingleAnswer = async (req, res) => {
   }
 };
 
-exports.postReply = async (req, res) => {
-  const reply = req.body.reply || "";
-  const userId = req.user._id || "";
-  const answerId = req.body.answerId || "";
-  const questionId = req.body.questionId || "";
+// exports.postReply = async (req, res) => {
+//   const reply = req.body.reply || "";
+//   const userId = req.user._id || "";
+//   const answerId = req.body.answerId || "";
+//   const questionId = req.body.questionId || "";
 
-  try {
-    let newReply = await Question.findByIdAndUpdate(
-      {
-        _id: questionId,
-        "answer._id": answerId,
-      },
-      {
-        $addToSet: {
-          answer: {
-            replies: { reply, userId },
-          },
-        },
-      }
-    );
-    if (newReply) {
-      res.json({
-        msg: "Reply posted successfully",
-        newReply,
-      });
-    } else {
-      res.json({
-        msg: "Reply not found",
-      });
-    }
-  } catch (error) {
-    res.json({ error });
-  }
-};
+//   try {
+//     let newReply = await Question.findByIdAndUpdate(
+//       {
+//         _id: questionId,
+//         "answer._id": answerId,
+//       },
+//       {
+//         $addToSet: {
+//           answer: {
+//             replies: { reply, userId },
+//           },
+//         },
+//       }
+//     );
+//     if (newReply) {
+//       res.json({
+//         msg: "Reply posted successfully",
+//         newReply,
+//       });
+//     } else {
+//       res.json({
+//         msg: "Reply not found",
+//       });
+//     }
+//   } catch (error) {
+//     res.json({ error });
+//   }
+// };
 
 //   Question.findOneAndUpdate(
 //     { _id: answerId },
@@ -305,35 +307,35 @@ exports.postReply = async (req, res) => {
 //   );
 // };
 
-exports.updateReply = (req, res) => {
-  const answerId = req.body.answerId;
-  const replyId = req.body.replyId;
-  const replyContent = req.body.replyContent;
+// exports.updateReply = (req, res) => {
+//   const answerId = req.body.answerId;
+//   const replyId = req.body.replyId;
+//   const replyContent = req.body.replyContent;
 
-  Question.findOneAndUpdate(
-    { _id: answerId, replies: { $elemMatch: { _id: replyId } } },
-    {
-      $set: {
-        "replies.$.reply": replyContent,
-      },
-    },
-    { new: true },
-    (err, reply) => {
-      if (err) {
-        res.status(400).json({
-          error: errorHandler(err),
-        });
-      }
-      if (!reply) {
-        res.json({
-          error: "Something went wrong. Please try again.",
-        });
-      } else {
-        res.json({
-          msg: "Reply updated successfully",
-          reply,
-        });
-      }
-    }
-  );
-};
+//   Question.findOneAndUpdate(
+//     { _id: answerId, replies: { $elemMatch: { _id: replyId } } },
+//     {
+//       $set: {
+//         "replies.$.reply": replyContent,
+//       },
+//     },
+//     { new: true },
+//     (err, reply) => {
+//       if (err) {
+//         res.status(400).json({
+//           error: errorHandler(err),
+//         });
+//       }
+//       if (!reply) {
+//         res.json({
+//           error: "Something went wrong. Please try again.",
+//         });
+//       } else {
+//         res.json({
+//           msg: "Reply updated successfully",
+//           reply,
+//         });
+//       }
+//     }
+//   );
+// };
