@@ -28,6 +28,7 @@ router.delete("/community/deleteQuestion", requireSignin, removeQuestion);
 router.delete("/community/deleteAnswer", requireSignin, removeAnswer);
 router.get("/community/getSingleQuestion/:questionId", getSingleQuestion);
 router.get("/community/getSingleAnswer/:answerId", getSingleAnswer);
+
 // router.post("/community/postReply", requireSignin, postReply);
 // router.put("/community/updateReply", requireSignin, updateReply);
 // // router.delete("/community/deleteReply/:answerId", requireSignin, removeReply);
