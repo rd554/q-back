@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const upload = require("../uploads/ImageUpload");
 const _ = require("lodash");
 const formidalble = require("formidable");
 const fs = require("fs");
@@ -80,3 +81,27 @@ exports.photo = (req, res) => {
     }
   });
 };
+
+// (exports.postPhoto = upload.single("photo")),
+//   (req, res) => {
+//     User.findOneAndUpdate(
+//       { username: req.params.username },
+//       {
+//         $set: {
+//           photo: req.file,
+//         },
+//       },
+//       { new: true },
+//       (err, user) => {
+//         if (err || !user) {
+//           return res.status(400).json({
+//             error: "User not found",
+//           });
+//         } else {
+//           res.status(200).json({
+//             msg: "Photo uploaded successfully",
+//           });
+//         }
+//       }
+//     );
+//   };
