@@ -15,6 +15,20 @@ const questionSchema = new mongoose.Schema(
     questionScope: {
       type: String,
     },
+    claps: [
+      {
+        ip: {
+          type: String,
+          required: true,
+          match: /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
+        },
+        hits: {
+          type: Number,
+          default: 1,
+          required: false,
+        },
+      },
+    ],
     photo: {
       data: String,
       required: false,

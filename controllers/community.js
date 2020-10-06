@@ -66,11 +66,11 @@ exports.listAllCards = (req, res) => {
 
   let questions;
 
-  Question.find({}, { answers: { $slice: 2 } })
+  Question.find({}, { answers: { $slice: 5 } })
     .populate("postedBy", "_id name email")
     .populate("answers.userId", "_id name email")
     .sort({ _id: -1 })
-    .select("_id question postedBy createdAt questionScope")
+    .select("_id question postedBy createdAt questionScope answerScope")
     .limit(limit)
     .skip(skip)
     .exec((err, data) => {
@@ -92,7 +92,7 @@ exports.listAllCards = (req, res) => {
 };
 
 exports.list = (req, res) => {
-  Question.find({}, { answers: { $slice: 2 } })
+  Question.find({}, { answers: { $slice: 5 } })
     .populate("postedBy", "_id name")
     .populate("answers.userId", "_id name")
     .sort({ _id: -1 })

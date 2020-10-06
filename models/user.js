@@ -42,8 +42,8 @@ const userSchema = new mongoose.Schema(
       default: 0,
     },
     photo: {
-      data: Buffer,
-      contentType: String,
+      type: String,
+      default: "",
     },
     reserPasswordLink: {
       data: String,
