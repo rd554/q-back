@@ -33,7 +33,7 @@ const blogSchema = new mongoose.Schema(
       type: String,
     },
     photo: {
-      contentType: String,
+      type: String,
       default: "",
     },
     categories: [{ type: ObjectId, ref: "Category", required: true }],
