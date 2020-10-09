@@ -200,22 +200,30 @@ exports.listAllBlogsCategoriesTags = (req, res) => {
 
 
 exports.read = (req, res) => {
-  const slug = req.params.slug.toLowerCase();
-  Blog.findOne({ slug })
-    .populate("categories", "_id name slug")
-    .populate("tags", "_id name slug")
-    .populate("postedBy", "_id name username")
-    .select(
-      "_id title body slug photo mtitle mdesc categories tags postedBy createdAt updatedAt"
-    )
-    .exec((err, data) => {
-      if (err) {
-        return res.json({
-          error: errorHandler(err),
-        });
-    }
-    })
-};
+    const slug = req.params.slug.toLowerCase();
+    Blog.findOne({ slug })
+      .populate("categories", "_id name slug")
+      .populate("tags", "_id name slug")
+      .populate("postedBy", "_id name username")
+      .select(
+        "_id title body slug mtitle mdesc categories tags postedBy createdAt updatedAt photo"
+      )
+      .exec((err, data) => {
+        if (err) {
+          return res.json({
+            error: errorHandler(err),
+          });
+        }
+        if (data) {
+          res.json(data);
+        } else {
+          res.json({
+            error: "data not found",
+          });
+        }
+      });
+  };
+
 
 exports.remove = (req, res) => {
     const slug = req.params.slug.toLowerCase();
