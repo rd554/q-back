@@ -34,6 +34,7 @@ mongoose
 // middlewares
 app.use(morgan("dev"));
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 // cors
 if (process.env.NODE_ENV === "development") {
