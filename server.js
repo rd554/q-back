@@ -36,10 +36,6 @@ mongoose
 app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-<<<<<<< HEAD
-=======
-
->>>>>>> 7f5ca732b5440a9ff54a8da0e07681fcf113828b
 app.use(cookieParser());
 // cors
 if (process.env.NODE_ENV === "development") {
