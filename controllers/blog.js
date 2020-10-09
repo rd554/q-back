@@ -151,7 +151,6 @@ exports.blogsForHomePage = (req, res) => {
 };
 
 exports.listAllBlogsCategoriesTags = (req, res) => {
-<<<<<<< HEAD
   let limit = req.body.limit ? parseInt(req.body.limit) : 10;
   let skip = req.body.skip ? parseInt(req.body.skip) : 0;
 
@@ -189,57 +188,14 @@ exports.listAllBlogsCategoriesTags = (req, res) => {
           if (err) {
             return res.json({
               error: errorHandler(err),
-=======
-    let limit = req.body.limit ? parseInt(req.body.limit) : 10;
-    let skip = req.body.skip ? parseInt(req.body.skip) : 0;
-
-    let blogs;
-    let categories;
-    let tags;
-
-    Blog.find({})
-        .populate("categories", "_id name slug")
-        .populate("tags", "_id name slug")
-        .populate("postedBy", "_id name username profile")
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit)
-        .select(
-            "_id title slug excerpt categories tags postedBy createdAt updatedAt"
-        )
-        .exec((err, data) => {
-            if (err) {
-                return res.json({
-                    error: errorHandler(err),
-                });
-            }
-            blogs = data; //blogs
-            // get all categories
-            Category.find({}).exec((err, c) => {
-                if (err) {
-                    return res.json({
-                        error: errorHandler(err),
-                    });
-                }
-                categories = c; // all categories
-                // get all tags
-                Tag.find({}).exec((err, t) => {
-                    if (err) {
-                        return res.json({
-                            error: errorHandler(err),
-                        });
-                    }
-                    tags = t; // all tags
-                    // return all blogs categories tags
-                    res.json({ blogs, categories, tags, size: blogs.length });
-                });
->>>>>>> 7f5ca732b5440a9ff54a8da0e07681fcf113828b
             });
-        });
+        }});
+        })
+    })
+    
 };
 
 exports.read = (req, res) => {
-<<<<<<< HEAD
   const slug = req.params.slug.toLowerCase();
   Blog.findOne({ slug })
     .populate("categories", "_id name slug")
@@ -252,30 +208,9 @@ exports.read = (req, res) => {
       if (err) {
         return res.json({
           error: errorHandler(err),
-=======
-    const slug = req.params.slug.toLowerCase();
-    Blog.findOne({ slug })
-        .populate("categories", "_id name slug")
-        .populate("tags", "_id name slug")
-        .populate("postedBy", "_id name username")
-        .select(
-            "_id title body slug mtitle mdesc categories tags postedBy createdAt updatedAt"
-        )
-        .exec((err, data) => {
-            if (err) {
-                return res.json({
-                    error: errorHandler(err),
-                });
-            }
-            if (data) {
-                res.json(data);
-            } else {
-                res.json({
-                    error: "data not found",
-                });
-            }
->>>>>>> 7f5ca732b5440a9ff54a8da0e07681fcf113828b
         });
+    }
+    })
 };
 
 exports.remove = (req, res) => {
@@ -415,7 +350,6 @@ exports.listSearch = (req, res) => {
 };
 
 const s3 = new AWS.S3({
-<<<<<<< HEAD
   accessKeyId: process.env.AWS_ID,
   secretAccessKey: process.env.AWS_SECRET
 });
@@ -525,115 +459,3 @@ exports.create = async (req, res) => {
   })
 
 };
-=======
-    accessKeyId: process.env.AWS_ID,
-    secretAccessKey: process.env.AWS_SECRET
-});
-
-const uploadS3 = multer({
-
-    storage: multerS3({
-        s3: s3,
-        acl: 'public-read',
-        bucket: process.env.AWS_BUCKET_NAME,
-        metadata: (req, file, callBack) => {
-            callBack(null, { fieldName: file.fieldname })
-        },
-        key: (req, file, callBack) => {
-            var fullPath = file.originalname; //If you want to save into a folder concat de name of the folder to the path
-            callBack(null, fullPath)
-        }
-    }),
-
-}).array('photo', 10);
-
-
-
-exports.create = async (req, res) => {
-
-    uploadS3(req, res, (error) => {
-        // console.log('files', req.files, req.body);
-        if (error) {
-            console.log('errors', error);
-            res.status(500).json({
-                status: 'fail',
-                error: error
-            });
-        } else {
-            // If File not found
-
-            const { title, body, categories, tags } = req.body;
-            // const { photo } = req.file;
-
-            if (!title || !title.length) {
-                return res.status(400).json({
-                    error: "Title is required",
-                });
-            }
-            if (!body || body.length < 200) {
-                return res.status(400).json({
-                    error: "Content is too short",
-                });
-            }
-            if (!categories || !categories.length === 0) {
-                return res.status(400).json({
-                    error: "Atleast one category is required",
-                });
-            }
-            if (!tags || !tags.length) {
-                return res.status(400).json({
-                    error: "Atleast one tag is required",
-                });
-            }
-
-            let blog = new Blog();
-            blog.title = title;
-            blog.body = body;
-            blog.photo = req.files[0].location;
-            blog.excerpt = smartTrim(body, 120, " ", " ...");
-            blog.slug = slugify(title).toLowerCase();
-            blog.mtitle = `${title} | ${process.env.APP_NAME}`;
-            blog.mdesc = stripHtml(body.substring(0, 160));
-            blog.postedBy = req.user._id;
-
-            blog.save((err, result) => {
-              console
-                if (err) {
-                    return res.status(400).json({
-                        error: errorHandler(err),
-                    });
-                } else {
-                  res.status(200).send(result)
-                }
-            })
-            // categories and tags
-            // let arrayOfCategories = categories && categories.split(",");
-            // let arrayOfTags = tags && tags.split(",");
-            // Blog.findByIdAndUpdate(
-            //     result._id, {
-            //         $push: { categories: arrayOfCategories },
-            //     }, { new: true }
-            // ).exec((err, result) => {
-            //     if (err) {
-            //         return res.status(400).json({
-            //             error: errorHandler(err),
-            //         });
-            //     } else {
-            //         Blog.findByIdAndUpdate(
-            //             result._id, { $push: { tags: arrayOfTags } }, { new: true }
-            //         ).exec((err, result) => {
-            //             if (err) {
-            //                 return res.status(400).json({
-            //                     error: errorHandler(err),
-            //                 });
-            //             } else {
-            //                 res.json(result);
-            //             }
-            //         });
-            //     }
-            // });
-        }
-    })
-
-};
->>>>>>> 7f5ca732b5440a9ff54a8da0e07681fcf113828b
