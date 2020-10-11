@@ -4,7 +4,6 @@ const slugify = require("slugify");
 const { errorHandler } = require("../helpers/dbErrorHandler");
 
 exports.create = (req, res) => {
-  console.lor(req.body)
   const { name } = req.body;
   let slug = slugify(name).toLowerCase();
 

@@ -5,14 +5,13 @@ const Tag = require("../models/tag");
 const multer = require("multer");
 const multerS3 = require("multer-s3");
 const AWS = require("aws-sdk");
-const formidable = require("formidable");
-const FormData = require("form-data");
 const slugify = require("slugify");
 const stripHtml = require("string-strip-html");
 const _ = require("lodash");
 const { errorHandler } = require("../helpers/dbErrorHandler");
 const fs = require("fs");
 const { smartTrim } = require("../helpers/blog");
+const { Result } = require("express-validator");
 
 // exports.create = (req, res) => {
 //   let form = new formidable.IncomingForm();
@@ -323,7 +322,7 @@ exports.listRelated = (req, res) => {
     Blog.find({ _id: { $ne: _id }, categories: { $in: categories } })
         .limit(limit)
         .populate("postedBy", "_id name profile")
-        .select("title slug excerpt postedBy createdAt updatedAt")
+        .select("title slug excerpt postedBy photo createdAt updatedAt")
         .exec((err, blogs) => {
             if (err) {
                 return res.status(400).json({
@@ -384,8 +383,6 @@ const uploadS3 = multer({
 }).array('photo', 10);
 
 exports.create = async (req, res) => {
-  
-
   uploadS3(req, res, (error) => {
       // console.log('files', req.files, req.body);
       if (error) {
@@ -398,7 +395,7 @@ exports.create = async (req, res) => {
           // If File not found
 
           const { title, body, categories, tags } = req.body;
-          // const { photo } = req.file;
+          
 
           if (!title || !title.length) {
               return res.status(400).json({
@@ -425,11 +422,15 @@ exports.create = async (req, res) => {
           blog.title = title;
           blog.body = body;
           blog.photo = req.files[0].location;
-          blog.excerpt = smartTrim(body, 120, " ", " ...");
+          blog.excerpt = smartTrim(body, 80, " ", " ...");
           blog.slug = slugify(title).toLowerCase();
           blog.mtitle = `${title} | ${process.env.APP_NAME}`;
           blog.mdesc = stripHtml(body.substring(0, 160));
           blog.postedBy = req.user._id;
+
+          //   categories and tags
+          let arrayOfCategories = categories && categories.split(",");
+          let arrayOfTags = tags && tags.split(",");
 
           blog.save((err, result) => {
             console
@@ -437,36 +438,32 @@ exports.create = async (req, res) => {
                   return res.status(400).json({
                       error: errorHandler(err),
                   });
+              } 
+        
+          Blog.findByIdAndUpdate(
+              result._id, {
+                  $push: { categories: arrayOfCategories },
+              }, { new: true }
+          ).exec((err, result) => {
+              if (err) {
+                  return res.status(400).json({
+                      error: errorHandler(err),
+                  });
               } else {
-                res.status(200).send(result)
+                  Blog.findByIdAndUpdate(
+                      result._id, { $push: { tags: arrayOfTags } }, { new: true }
+                  ).exec((err, result) => {
+                      if (err) {
+                          return res.status(400).json({
+                              error: errorHandler(err),
+                          });
+                      } else {
+                          res.json(result);
+                      }
+                  });
               }
-          })
-          // categories and tags
-          // let arrayOfCategories = categories && categories.split(",");
-          // let arrayOfTags = tags && tags.split(",");
-          // Blog.findByIdAndUpdate(
-          //     result._id, {
-          //         $push: { categories: arrayOfCategories },
-          //     }, { new: true }
-          // ).exec((err, result) => {
-          //     if (err) {
-          //         return res.status(400).json({
-          //             error: errorHandler(err),
-          //         });
-          //     } else {
-          //         Blog.findByIdAndUpdate(
-          //             result._id, { $push: { tags: arrayOfTags } }, { new: true }
-          //         ).exec((err, result) => {
-          //             if (err) {
-          //                 return res.status(400).json({
-          //                     error: errorHandler(err),
-          //                 });
-          //             } else {
-          //                 res.json(result);
-          //             }
-          //         });
-          //     }
-          // });
+          });
+        })
       }
   })
 
