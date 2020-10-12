@@ -70,7 +70,7 @@ exports.listAllCards = (req, res) => {
     .populate("postedBy", "_id name email")
     .populate("answers.userId", "_id name email")
     .sort({ _id: -1 })
-    .select("_id question postedBy createdAt questionScope answerScope")
+    .select("_id question postedBy createdAt questionScope answerScope claps")
     .limit(limit)
     .skip(skip)
     .exec((err, data) => {
