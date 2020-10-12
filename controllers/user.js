@@ -1,11 +1,8 @@
 const User = require("../models/user");
-const upload = require("../uploads/ImageUpload");
 const multer = require("multer");
 const multerS3 = require("multer-s3");
 const AWS = require("aws-sdk");
 const _ = require("lodash");
-const fs = require("fs");
-const formidalble = require('formidable')
 const { errorHandler } = require("../helpers/dbErrorHandler");
 
 exports.read = (req, res) => {
@@ -48,46 +45,7 @@ exports.publicProfile = (req, res) => {
   });
 };
 
-// exports.update = (req, res) => {
-//   let form = new formidalble.IncomingForm();
-//   form.keepExtensions = true;
-//   form.parse(req, (err, fields, files) => {
-//     if (err) {
-//       return res.status(400).json({
-//         error: "Error uploading photo",
-//       });
-//     }
-//     let user = req.profile;
-//     user = _.extend(user, fields);
 
-//     if (fields.password && fields.password.length < 6) {
-//       return res.status(400).json({
-//         error: "Password should be min 6 characters long",
-//       });
-//     }
-
-//     if (files.photo) {
-//       if (files.photo.size > 100000) {
-//         return res.status(400).json({
-//           error: "Image should be less than 1 MB",
-//         });
-//       }
-//       user.photo.data = fs.readFileSync(files.photo.path);
-//       user.photo.contentType = files.photo.type;
-//     }
-//     user.save((err, result) => {
-//       if (err) {
-//         return res.status(400).json({
-//           error: errorHandler(err),
-//         });
-//       }
-//       user.hashed_password = undefined;
-//       user.salt = undefined;
-//       user.photo = undefined;
-//       res.json(result);
-//     });
-//   });
-// };
 
 exports.photo = (req, res) => {
   const username = req.params.username;
@@ -97,9 +55,9 @@ exports.photo = (req, res) => {
         error: "User not found",
       });
     }
-    if (user.photo.data) {
-      res.set("Content-Type", user.photo.contentType);
-      return res.send(user.photo.data);
+    else {
+      res.set("type", user.photo.type);
+      return res.send(user.photo);
     }
   });
 };
@@ -161,7 +119,7 @@ exports.update = async (req, res) => {
         newUser.email = email.length ? email : user.email
         newUser.hashed_password = password.length ? password : user.hashed_password
 
-        User.findByIdAndUpdate(userId, 
+        User.findByIdAndUpdate(userId,
           newUser, {new: true},
         (err, result) => {
           if (err) {
@@ -179,38 +137,6 @@ exports.update = async (req, res) => {
             });
           }
         });
-
-        // if(name.length){
-        //   user.name = name
-        // }
-        // if(username.length){
-        //   user.username = username
-        // }
-        // if(photo.length){
-        //   user.photo = photo
-        // }
-        // if(email.length){
-        //   user.email = email
-        // }
-        // if(password.length){
-        //   user.password = password
-        // }
-        // const updatedUser = new User(newUser);
-        // updatedUser.save((err, updatedUser) => {
-        //   if (err) {
-        //     return (
-        //       res.status(401).
-        //       json({
-        //         error: errorHandler(err),
-        //       })
-        //     );
-        //   }
-        //   return res.json({
-        //     message: "Profile updated successfully!",
-        //     updatedUser
-        //   });
-        // });
-        
       });
     }
   }) 
