@@ -137,53 +137,63 @@ exports.update = async (req, res) => {
             error: error
         });
     } else {
-
       
-      name = req.profile.name
-      username = req.profile.username
-      email = req.profile.email
-      password = req.profile.password
+      const user = req.profile;
+      // const {name, username, photo, email, password, hashed_password, profile} = req.profile;
 
+      // let user = new User();
+      // user.name = name;
+      // user.username = username;
+      // user.photo = photo;
+      // user.email = email;
+      // user.password = password;
+      // user.hashed_password = hashed_password;
+      // user.profile = profile;
 
-      let user = new User();
-      user.name = name;
-      user.username = username;
-      user.email = email;
-      user.password = password;
+      // let newName = name
+      // let newUsername = username
+      // let newPhoto = photo
+      // let newEmail = email
+      // let newPassword = password
 
       user.save((err, result) => {
         if (err) {
           return res.status(400).json({
             error: errorHandler(err),
           });
+        } else {
+          res.json(result)
         }
+
+
         
-        User.findByIdAndUpdate(result._id, 
-          { $set: 
-            {
-              name: name,
-              username: username,
-              email: email,
-              password: password,
-            },
-          },
-          {new: true},
-        (err, result) => {
-          if (err) {
-            res.status(400).json({
-              error: errorHandler(err),
-            });
-            return;
-          } else {
-            user.hashed_password = undefined;
-            user.salt = undefined;
-            user.photo = undefined;
-            res.status(200).json({
-              msg: "User updated successfully",
-              result,
-            });
-          }
-        });
+        // User.findByIdAndUpdate(result._id, 
+        //   { $push: 
+        //     {
+        //       name: newName,
+        //       username: newUsername,
+        //       photo: newPhoto,
+        //       email: newEmail,
+        //       password: newPassword,
+        //     },
+        //   },
+        //   {new: true},
+        // (err, result) => {
+        //   if (err) {
+        //     res.status(400).json({
+        //       error: errorHandler(err),
+        //     });
+        //     return;
+        //   } else {
+        //     user.hashed_password = undefined;
+        //     user.salt = undefined;
+        //     user.photo = undefined;
+        //     res.status(200).json({
+        //       msg: "User updated successfully",
+        //       result,
+        //     });
+        //   }
+        // });
       });
     }
   }) 
