@@ -1,4 +1,5 @@
 const Clap = require("../models/claps");
+const Question = require("../models/Cquestion");
 const { errorHandler } = require("../helpers/dbErrorHandler");
 
 exports.postClaps = (req, res) => {
@@ -29,6 +30,34 @@ exports.postClaps = (req, res) => {
     }
   );
 };
+
+
+exports.postClapsForUser = (req, res) => {
+
+  const questionId = req.body.questionId || ''
+  let clapsNumber = req.body.clapsNumber || 0
+  clapsNumber = clapsNumber + 1
+
+  Question.findOneAndUpdate(
+    { _id: questionId },
+    { $set: { claps: clapsNumber } },
+    { new: true },
+    (err, question) => {
+      if (err) {
+        res.status(400).json({
+          error: errorHandler(err),
+        });
+        return;
+      } else {
+        res.status(200).json({
+          msg: "claps updated successfully",
+          question,
+        });
+      }
+    }
+  );
+}
+
 
 //   const claps = req.body.claps || "";
 

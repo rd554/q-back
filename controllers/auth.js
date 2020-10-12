@@ -87,7 +87,7 @@ exports.signup = (req, res) => {
     jwt.verify(token, process.env.JWT_ACCOUNT_ACTIVATION, (err, decoded) => {
       if (err) {
         return (
-          res.status(401),
+          res.status(401).
           json({
             error: "Expired link. Signup again",
           })
@@ -103,7 +103,7 @@ exports.signup = (req, res) => {
       user.save((err, user) => {
         if (err) {
           return (
-            res.status(401),
+            res.status(401).
             json({
               error: errorHandler(err),
             })

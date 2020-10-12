@@ -138,62 +138,79 @@ exports.update = async (req, res) => {
         });
     } else {
       
-      const user = req.profile;
-      // const {name, username, photo, email, password, hashed_password, profile} = req.profile;
+      // const user = req.body;
+      const name = req.body.name || ''
+      const username = req.body.username || ''
+      const photo = req.files[0].location || ''
+      const email = req.body.email || ''
+      const password = req.body.password || ''
+      const userId = req.user._id;
 
-      // let user = new User();
-      // user.name = name;
-      // user.username = username;
-      // user.photo = photo;
-      // user.email = email;
-      // user.password = password;
-      // user.hashed_password = hashed_password;
-      // user.profile = profile;
-
-      // let newName = name
-      // let newUsername = username
-      // let newPhoto = photo
-      // let newEmail = email
-      // let newPassword = password
-
-      user.save((err, result) => {
-        if (err) {
+      User.findById({ _id: userId }).exec((err, user) => {
+        if (err || !user) {
           return res.status(400).json({
-            error: errorHandler(err),
+            error: "User not found",
           });
-        } else {
-          res.json(result)
         }
 
 
-        
-        // User.findByIdAndUpdate(result._id, 
-        //   { $push: 
-        //     {
-        //       name: newName,
-        //       username: newUsername,
-        //       photo: newPhoto,
-        //       email: newEmail,
-        //       password: newPassword,
-        //     },
-        //   },
-        //   {new: true},
-        // (err, result) => {
+        const newUser = {}
+        newUser.name = name.length ? name : user.name
+        newUser.username = username.length ? username : user.username
+        newUser.photo = photo.length ? photo : user.photo
+        newUser.email = email.length ? email : user.email
+        newUser.hashed_password = password.length ? password : user.hashed_password
+
+        User.findByIdAndUpdate(userId, 
+          newUser, {new: true},
+        (err, result) => {
+          if (err) {
+            res.status(400).json({
+              error: errorHandler(err),
+            });
+            return;
+          } else {
+            result.hashed_password = undefined;
+            result.salt = undefined;
+            result.photo = undefined;
+            res.status(200).json({
+              msg: "User updated successfully",
+              result,
+            });
+          }
+        });
+
+        // if(name.length){
+        //   user.name = name
+        // }
+        // if(username.length){
+        //   user.username = username
+        // }
+        // if(photo.length){
+        //   user.photo = photo
+        // }
+        // if(email.length){
+        //   user.email = email
+        // }
+        // if(password.length){
+        //   user.password = password
+        // }
+        // const updatedUser = new User(newUser);
+        // updatedUser.save((err, updatedUser) => {
         //   if (err) {
-        //     res.status(400).json({
-        //       error: errorHandler(err),
-        //     });
-        //     return;
-        //   } else {
-        //     user.hashed_password = undefined;
-        //     user.salt = undefined;
-        //     user.photo = undefined;
-        //     res.status(200).json({
-        //       msg: "User updated successfully",
-        //       result,
-        //     });
+        //     return (
+        //       res.status(401).
+        //       json({
+        //         error: errorHandler(err),
+        //       })
+        //     );
         //   }
+        //   return res.json({
+        //     message: "Profile updated successfully!",
+        //     updatedUser
+        //   });
         // });
+        
       });
     }
   }) 
