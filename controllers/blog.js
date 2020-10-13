@@ -302,7 +302,7 @@ exports.create = async (req, res) => {
                   error: "Title is required",
               });
           }
-          if (!body || body.length < 200) {
+          if (!body || body.length < 100) {
               return res.status(400).json({
                   error: "Content is too short",
               });
