@@ -4,6 +4,7 @@ const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const path = require('path')
 
 require("dotenv").config();
 
@@ -13,9 +14,8 @@ const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user");
 const categoryRoutes = require("./routes/category");
 const tagRoutes = require("./routes/tag");
-const formRoutes = require("./routes/form");
 const communityRoutes = require("./routes/community");
-const clapRoutes = require("./routes/clap");
+
 
 // app
 const app = express();
@@ -46,10 +46,17 @@ app.use("/api", authRoutes);
 app.use("/api", userRoutes);
 app.use("/api", categoryRoutes);
 app.use("/api", tagRoutes);
-app.use("/api", formRoutes);
 app.use(express.static("public"));
+app.use(express.static("public/build"));
 app.use("/api", communityRoutes);
-app.use("/api", clapRoutes);
+
+// app.get('*', (req,res)=> {
+
+  
+//   res.sendFile(path.resolve(__dirname, 'public', 'build'))
+  
+// })
+
 
 // port
 const port = process.env.PORT || 8000;

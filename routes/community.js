@@ -11,6 +11,7 @@ const {
   removeAnswer,
   getSingleQuestion,
   getSingleAnswer,
+  postClapsForUser
   // postReply,
   // updateReply,
   // removeReply,
@@ -28,6 +29,8 @@ router.delete("/community/deleteQuestion", requireSignin, removeQuestion);
 router.delete("/community/deleteAnswer", requireSignin, removeAnswer);
 router.get("/community/getSingleQuestion/:questionId", getSingleQuestion);
 router.get("/community/getSingleAnswer/:answerId", getSingleAnswer);
+router.post("/community/postClapsForUser", requireSignin, postClapsForUser);
+
 
 // router.post("/community/postReply", requireSignin, postReply);
 // router.put("/community/updateReply", requireSignin, updateReply);
