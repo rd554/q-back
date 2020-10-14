@@ -339,3 +339,30 @@ exports.getSingleAnswer = async (req, res) => {
 //     }
 //   );
 // };
+
+exports.postClapsForUser = (req, res) => {
+
+  const questionId = req.body.questionId || ''
+  let clapsNumber = req.body.clapsNumber || 0
+  clapsNumber = clapsNumber + 1
+
+  Question.findOneAndUpdate(
+    { _id: questionId },
+    { $set: { claps: clapsNumber } },
+    { new: true },
+    (err, question) => {
+      if (err) {
+        res.status(400).json({
+          error: errorHandler(err),
+        });
+        return;
+      } else {
+        res.status(200).json({
+          msg: "claps updated successfully",
+          question,
+        });
+      }
+    }
+  );
+}
+
