@@ -99,10 +99,16 @@ exports.update = async (req, res) => {
       // const user = req.body;
       const name = req.body.name || ''
       const username = req.body.username || ''
-      const photo = req.files[0].location || ''
       const email = req.body.email || ''
       const password = req.body.password || ''
       const userId = req.user._id;
+      let photo = ''
+
+      if(req.files.length){
+        if(req.files[0].location){
+          photo = req.files[0].location
+        }
+      }
 
       User.findById({ _id: userId }).exec((err, user) => {
         if (err || !user) {

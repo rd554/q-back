@@ -5,7 +5,7 @@ const { update, photo, read} = require("../controllers/user");
 
 router.get("/user", requireSignin, authMiddleware, read);
 // router.get("/user/:username", publicProfile);
-router.put("/user/update", requireSignin, authMiddleware, update);
+router.post("/user/update", requireSignin, authMiddleware, update);
 router.get("/user/photo/:username", photo);
 
 

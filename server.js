@@ -47,16 +47,17 @@ app.use("/api", userRoutes);
 app.use("/api", categoryRoutes);
 app.use("/api", tagRoutes);
 app.use(express.static("public"));
-app.use(express.static("public/build"));
+
 app.use("/api", communityRoutes);
 
-// app.get('*', (req,res)=> {
+// Set static folder
+// All the javascript and css files will be read and served from this folder
+app.use(express.static("public/build"));
 
-  
-//   res.sendFile(path.resolve(__dirname, 'public', 'build'))
-  
-// })
-
+// index.html for all page routes  html or routing and naviagtion
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'public', 'build'))
+});
 
 // port
 const port = process.env.PORT || 8000;

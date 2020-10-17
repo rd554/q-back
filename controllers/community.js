@@ -1,6 +1,7 @@
 const Question = require("../models/Cquestion");
 const { errorHandler } = require("../helpers/dbErrorHandler");
 
+
 exports.postQuestion = (req, res) => {
   const newQuestion = new Question({
     question: req.body.question || "",
@@ -57,6 +58,7 @@ exports.postAnswer = (req, res) => {
 };
 
 exports.listAllCards = (req, res) => {
+
   // let limit = req.body.limit ? parseInt(req.body.limit) : 10;
   // let skip = req.body.skip ? parseInt(req.body.skip) : 1;
   let limit = 10;
@@ -82,7 +84,7 @@ exports.listAllCards = (req, res) => {
       // uddating the existing array
       questions = data;
       if (questions) {
-        res.json({ questions, size: questions.length });
+        res.json({  questions, size: questions.length });
       } else {
         res.json({
           error: "Data not found",
