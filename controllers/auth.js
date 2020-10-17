@@ -141,7 +141,7 @@ exports.signin = (req, res) => {
       expiresIn: "1d",
     });
     res.cookie("token", token, { expiresIn: "1d" });
-    const { _id, username, name, email, role } = user;
+    const { _id, username, name, email, role, photo } = user;
     return res.json({
       token,
       user: { _id, username, name, email, role },
@@ -296,10 +296,10 @@ exports.googleLogin = (req, res) => {
               expiresIn: "1d",
             });
             res.cookie("token", token, { expiresIn: "1d" });
-            const { _id, email, name, role, username } = user;
+            const { _id, email, name, role, username, photo } = user;
             return res.json({
               token,
-              user: { _id, email, name, role, username },
+              user: { _id, email, name, role, username, photo },
             });
           } else {
             let username = shortId.generate();
@@ -320,10 +320,10 @@ exports.googleLogin = (req, res) => {
                 }
               );
               res.cookie("token", token, { expiresIn: "1d" });
-              const { _id, email, name, role, username } = data;
+              const { _id, email, name, role, username, photo } = data;
               return res.json({
                 token,
-                user: { _id, email, name, role, username },
+                user: { _id, email, name, role, username, photo },
               });
             });
           }
