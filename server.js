@@ -4,7 +4,7 @@ const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const mongoose = require("mongoose");
-const path = require('path')
+// const path = require('path')
 
 require("dotenv").config();
 
@@ -22,7 +22,7 @@ const app = express();
 
 // db
 mongoose
-  .connect(process.env.DATABASE_CLOUD, {
+  .connect(process.env.DATABASE_LOCAL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
@@ -50,14 +50,14 @@ app.use(express.static("public"));
 
 app.use("/api", communityRoutes);
 
-// Set static folder
-// All the javascript and css files will be read and served from this folder
-app.use(express.static("public/build"));
+// // Set static folder
+// // All the javascript and css files will be read and served from this folder
+// app.use(express.static("public/build"));
 
-// index.html for all page routes  html or routing and naviagtion
-app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'public', 'build'))
-});
+// // index.html for all page routes  html or routing and naviagtion
+// app.get("*", (req, res) => {
+//   res.sendFile(path.resolve(__dirname, 'public', 'build'))
+// });
 
 // port
 const port = process.env.PORT || 8000;
