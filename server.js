@@ -13,7 +13,7 @@ const blogRoutes = require("./routes/blog");
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user");
 const categoryRoutes = require("./routes/category");
-// const tagRoutes = require("./routes/tag");
+const tagRoutes = require("./routes/tag");
 const communityRoutes = require("./routes/community");
 
 
